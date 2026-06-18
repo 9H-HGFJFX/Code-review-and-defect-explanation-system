@@ -1,0 +1,19 @@
+server:
+  port: 8080
+  netty:
+    max-keep-alive-requests: 500
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    root: WARN
+    com.codeaudit: INFO
+
+ratelimit:
+  review-per-minute: 5
+  common-per-minute: 100
+  public-per-minute: 60

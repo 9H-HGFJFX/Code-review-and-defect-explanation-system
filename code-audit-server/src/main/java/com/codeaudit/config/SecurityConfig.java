@@ -53,26 +53,10 @@ public class SecurityConfig {
             // 异常处理
             .exceptionHandling(ex -> ex.authenticationEntryPoint(restAuthEntryPoint))
             // 授权规则
+            // V1.0 适配网关：所有路径放行，鉴权交由网关（注入 X-User-* 头）
+            // 本地开发模式：JwtAuthenticationFilter 仍会解析 Authorization，注入 SecurityContext
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/api/auth/login",
-                    "/api/auth/register",
-                    "/api/auth/refresh",
-                    "/doc.html",
-                    "/v3/api-docs/**",
-                    "/swagger-resources/**",
-                    "/webjars/**",
-                    "/favicon.ico",
-                    "/error"
-                ).permitAll()
-                // 教师/管理员专属
-                .requestMatchers("/api/rule/add", "/api/rule/update/**", "/api/rule/delete/**")
-                    .hasAnyRole("TEACHER", "ADMIN")
-                .requestMatchers("/api/class/**", "/api/statistic/**")
-                    .hasAnyRole("TEACHER", "ADMIN")
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                // 其他都需要登录
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
             )
             // JWT 过滤器
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

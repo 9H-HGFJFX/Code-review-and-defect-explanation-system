@@ -1,0 +1,14 @@
+server:
+  port: 8080
+  netty:
+    max-keep-alive-requests: 200
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+logging:
+  level:
+    com.codeaudit: DEBUG
+    org.springframework.cloud.gateway: DEBUG

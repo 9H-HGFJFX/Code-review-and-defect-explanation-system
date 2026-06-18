@@ -1,0 +1,109 @@
+server:
+  port: 8080
+  netty:
+    max-keep-alive-requests: 200
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: code-audit-gateway
+  profiles:
+    active: dev
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+      timeout: 5000
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 2
+  cloud:
+    gateway:
+      # 全局跨域
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: false
+            maxAge: 3600
+      # 全局默认过滤器
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+        - name: RequestSize
+          args:
+            maxSize: 1MB
+      # 路由
+      routes:
+        - id: code-audit-server
+          uri: http://${BACKEND_HOST:backend}:${BACKEND_PORT:8080}
+          predicates:
+            - Path=/api/**
+          filters:
+            - StripPrefix=1
+            - name: Retry
+              args:
+                retries: 2
+                statuses: BAD_GATEWAY,GATEWAY_TIMEOUT,SERVICE_UNAVAILABLE
+                backoff:
+                  firstBackoff: 1s
+                  maxBackoff: 3s
+                  factor: 2
+        - id: code-audit-doc
+          uri: http://${BACKEND_HOST:backend}:${BACKEND_PORT:8080}
+          predicates:
+            - Path=/v3/api-docs/**,/doc.html,/webjars/**
+
+# JWT
+jwt:
+  secret: ${JWT_SECRET:code-audit-secret-key-please-change-in-production-environment-2026}
+  header: Authorization
+  prefix: "Bearer "
+
+# 限流
+ratelimit:
+  # 审查接口每分钟 5 次
+  review-per-minute: 5
+  # 普通接口每分钟 60 次
+  common-per-minute: 60
+  # 公开接口每分钟 30 次（按 IP）
+  public-per-minute: 30
+
+# 角色权限路径映射
+auth:
+  public-paths:
+    - /api/auth/login
+    - /api/auth/register
+    - /api/auth/refresh
+  teacher-admin-paths:
+    - /api/rule/add
+    - /api/rule/update/**
+    - /api/rule/delete/**
+    - /api/rule/refresh
+    - /api/class/**
+    - /api/statistic/**
+  admin-only-paths:
+    - /api/user/**
+    - /api/admin/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+
+logging:
+  level:
+    root: INFO
+    com.codeaudit: DEBUG
+    org.springframework.cloud.gateway: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

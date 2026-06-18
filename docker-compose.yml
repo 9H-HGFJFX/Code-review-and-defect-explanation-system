@@ -1,11 +1,18 @@
-# 代码审查与缺陷解释系统 - Docker Compose 一键部署
+# 代码审查与缺陷解释系统 - Docker Compose 一键部署（4 层架构版）
 # 使用：docker compose up -d
 # 关闭：docker compose down
+#
+# 服务清单（5 个容器）：
+#   1. mysql   - MySQL 8.0（数据层）
+#   2. redis   - Redis 7.0（数据层 + 缓存）
+#   3. backend - Spring Boot 业务服务（业务层，内网）
+#   4. gateway - Spring Cloud Gateway（网关层，内网）
+#   5. nginx   - Nginx 1.24（接入层，对外）
 
 version: "3.9"
 
 services:
-  # MySQL 8.0
+  # ============== 数据层 ==============
   mysql:
     image: mysql:8.0
     container_name: code-audit-mysql
@@ -20,8 +27,8 @@ services:
       - --default-authentication-plugin=mysql_native_password
       - --max_connections=200
       - --innodb_buffer_pool_size=512M
-    ports:
-      - "3306:3306"
+    expose:
+      - "3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./code-audit-server/src/main/resources/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -33,14 +40,13 @@ services:
     networks:
       - code-audit-net
 
-  # Redis 7.0
   redis:
     image: redis:7.0-alpine
     container_name: code-audit-redis
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
-    ports:
-      - "6379:6379"
+    expose:
+      - "6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -51,7 +57,7 @@ services:
     networks:
       - code-audit-net
 
-  # 后端服务
+  # ============== 业务层 ==============
   backend:
     build:
       context: ./code-audit-server
@@ -73,24 +79,47 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       JWT_SECRET: code-audit-prod-secret-please-rotate-2026
-      # M3 API 配置（不启用则 M3_ENABLED=false 即可）
+      # M3 API（不启用则 M3_ENABLED=false）
       M3_ENABLED: "false"
       M3_API_KEY: ""
       M3_BASE_URL: https://api.MiniMax.chat/v1
       M3_MODEL: MiniMax-M3
       TZ: Asia/Shanghai
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"     # 仅内网，不映射主机
     networks:
       - code-audit-net
 
-  # Nginx - 前端 + 反向代理
+  # ============== 网关层 ==============
+  gateway:
+    build:
+      context: ./code-audit-gateway
+      dockerfile: Dockerfile
+    container_name: code-audit-gateway
+    restart: unless-stopped
+    depends_on:
+      - backend
+      - redis
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      BACKEND_HOST: backend
+      BACKEND_PORT: 8080
+      JWT_SECRET: code-audit-prod-secret-please-rotate-2026   # 与 backend 一致
+      TZ: Asia/Shanghai
+    expose:
+      - "8080"     # 仅内网，不映射主机
+    networks:
+      - code-audit-net
+
+  # ============== 接入层 ==============
   nginx:
     image: nginx:1.24-alpine
     container_name: code-audit-nginx
     restart: unless-stopped
     depends_on:
-      - backend
+      - gateway
     ports:
       - "80:80"
       - "443:443"
