@@ -1,0 +1,110 @@
+# 代码审查与缺陷解释系统 - Docker Compose 一键部署
+# 使用：docker compose up -d
+# 关闭：docker compose down
+
+version: "3.9"
+
+services:
+  # MySQL 8.0
+  mysql:
+    image: mysql:8.0
+    container_name: code-audit-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: code_audit
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+      - --max_connections=200
+      - --innodb_buffer_pool_size=512M
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./code-audit-server/src/main/resources/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot123"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - code-audit-net
+
+  # Redis 7.0
+  redis:
+    image: redis:7.0-alpine
+    container_name: code-audit-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - code-audit-net
+
+  # 后端服务
+  backend:
+    build:
+      context: ./code-audit-server
+      dockerfile: Dockerfile
+    container_name: code-audit-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DB: code_audit
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root123
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: code-audit-prod-secret-please-rotate-2026
+      # M3 API 配置（不启用则 M3_ENABLED=false 即可）
+      M3_ENABLED: "false"
+      M3_API_KEY: ""
+      M3_BASE_URL: https://api.MiniMax.chat/v1
+      M3_MODEL: MiniMax-M3
+      TZ: Asia/Shanghai
+    ports:
+      - "8080:8080"
+    networks:
+      - code-audit-net
+
+  # Nginx - 前端 + 反向代理
+  nginx:
+    image: nginx:1.24-alpine
+    container_name: code-audit-nginx
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./code-audit-web/dist:/usr/share/nginx/html:ro
+      - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./deploy/nginx/conf.d:/etc/nginx/conf.d:ro
+    networks:
+      - code-audit-net
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  code-audit-net:
+    driver: bridge

@@ -1,0 +1,103 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  tomcat:
+    max-threads: 200
+    max-connections: 8192
+
+spring:
+  application:
+    name: code-audit-server
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB:code_audit}?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root123}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+      timeout: 5000
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 2
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 2MB
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non_null
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    cache-enabled: false
+  global-config:
+    db-config:
+      id-type: AUTO
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      table-underline: true
+  mapper-locations: classpath*:mapper/**/*.xml
+
+# JWT 配置
+jwt:
+  secret: ${JWT_SECRET:code-audit-secret-key-please-change-in-production-environment-2026}
+  # AccessToken 2小时
+  access-expire-seconds: 7200
+  # RefreshToken 7天
+  refresh-expire-seconds: 604800
+  header: Authorization
+  prefix: "Bearer "
+
+# 代码审查配置
+code-audit:
+  # 单次最大代码行数（需求分析要求 ≤500 行）
+  max-lines: 500
+  # 同步审查最大代码行数
+  sync-max-lines: 500
+  # 异步审查最大代码行数
+  async-max-lines: 5000
+  # 审查任务超时（毫秒）
+  review-timeout-ms: 30000
+  # 审查任务线程池大小
+  review-pool-size: 10
+
+# MiniMax M3 API（缺陷解释）
+MiniMax:
+  api-key: ${M3_API_KEY:your-api-key-here}
+  base-url: ${M3_BASE_URL:https://api.MiniMax.chat/v1}
+  model: ${M3_MODEL:MiniMax-M3}
+  enabled: ${M3_ENABLED:false}
+  timeout-seconds: 30
+
+# 限流配置
+ratelimit:
+  code-review-per-minute: 5
+
+# 日志
+logging:
+  level:
+    root: INFO
+    com.codeaudit: DEBUG
+    com.baomidou.mybatisplus: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/code-audit-server.log

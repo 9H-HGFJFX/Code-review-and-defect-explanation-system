@@ -1,0 +1,22 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    root: WARN
+    com.codeaudit: INFO
+
+code-audit:
+  max-lines: 500
+  sync-max-lines: 500
+  async-max-lines: 5000
+  review-timeout-ms: 30000
+  review-pool-size: 20
+
+MiniMax:
+  enabled: ${M3_ENABLED:false}
+  api-key: ${M3_API_KEY:}
+  model: ${M3_MODEL:MiniMax-M3}
+  base-url: ${M3_BASE_URL:https://api.MiniMax.chat/v1}

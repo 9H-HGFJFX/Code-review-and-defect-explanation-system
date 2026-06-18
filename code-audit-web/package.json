@@ -1,0 +1,33 @@
+{
+  "name": "code-audit-web",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "代码审查与缺陷解释系统 - 前端",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0",
+    "pinia": "^2.1.7",
+    "axios": "^1.6.8",
+    "element-plus": "^2.6.2",
+    "@element-plus/icons-vue": "^2.3.1",
+    "monaco-editor": "^0.45.0",
+    "echarts": "^5.5.0",
+    "vue-echarts": "^6.7.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "typescript": "^5.4.3",
+    "vite": "^5.2.6",
+    "vue-tsc": "^2.0.7",
+    "unplugin-auto-import": "^0.17.5",
+    "unplugin-vue-components": "^0.26.0"
+  }
+}

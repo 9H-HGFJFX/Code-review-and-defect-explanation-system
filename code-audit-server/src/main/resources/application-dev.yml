@@ -1,0 +1,21 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+logging:
+  level:
+    com.codeaudit: DEBUG
+    org.springframework.security: INFO
+
+code-audit:
+  max-lines: 500
+  sync-max-lines: 500
+  async-max-lines: 5000
+  review-timeout-ms: 30000
+  review-pool-size: 10
+
+MiniMax:
+  enabled: false
+  model: MiniMax-M3
+  base-url: https://api.MiniMax.chat/v1
