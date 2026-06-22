@@ -1,0 +1,99 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.codeaudit:code-audit-server >-------------------
+[INFO] Building code-audit-server 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.2.5:run (default-cli) > test-compile @ code-audit-server >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ code-audit-server ---
+[INFO] Copying 4 resources from src\main\resources to target\classes
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ code-audit-server ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 90 source files with javac [debug release 17] to target\classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ code-audit-server ---
+[INFO] skip non existing resourceDirectory D:\Git\code-insight--defect-decoder\code-audit-server\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ code-audit-server ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 1 source file with javac [debug release 17] to target\test-classes
+[INFO] 
+[INFO] <<< spring-boot:3.2.5:run (default-cli) < test-compile @ code-audit-server <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.2.5:run (default-cli) @ code-audit-server ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-06-22 16:15:05.786 [main] INFO  com.codeaudit.CodeAuditApplication - Starting CodeAuditApplication using Java 17.0.8 with PID 91004 (D:\Git\code-insight--defect-decoder\code-audit-server\target\classes started by LENOVO in D:\Git\code-insight--defect-decoder\code-audit-server)
+2026-06-22 16:15:05.789 [main] DEBUG com.codeaudit.CodeAuditApplication - Running with Spring Boot v3.2.5, Spring v6.1.6
+2026-06-22 16:15:05.789 [main] INFO  com.codeaudit.CodeAuditApplication - The following 1 profile is active: "test"
+2026-06-22 16:15:06.959 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-06-22 16:15:06.970 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-06-22 16:15:06.970 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-06-22 16:15:07.042 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-06-22 16:15:07.043 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1212 ms
+2026-06-22 16:15:07.069 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-06-22 16:15:07.202 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:code_audit user=SA
+2026-06-22 16:15:07.205 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-06-22 16:15:07.212 [main] INFO  o.s.b.a.h.H2ConsoleAutoConfiguration - H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:code_audit'
+2026-06-22 16:15:07.329 [main] DEBUG c.c.security.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+Logging initialized using 'class org.apache.ibatis.logging.stdout.StdOutImpl' adapter.
+Initialization Sequence datacenterId:0 workerId:12
+ _ _   |_  _ _|_. ___ _ |    _ 
+| | |\/|_)(_| | |_\  |_)||_|_\ 
+     /               |         
+                        3.5.5 
+2026-06-22 16:15:07.717 [main] INFO  com.codeaudit.engine.ReviewEngine - [ENGINE] ��ע�� 21 ������ִ����: [commandInjectionScanner, emptyCatchDetector, floatEqualityDetector, hardcodedSecretScanner, structureChecker, sqlInjectionScanner, divideByZeroDetector, concurrentModDetector, nullPointerDetector, unsafeCastDetector, insecureCryptoScanner, sensitiveLogScanner, pathTraversalScanner, xssScanner, broadCatchDetector, conditionDetector, unsafeDeserializeScanner, namingChecker, infiniteLoopDetector, formatChecker, resourceLeakDetector]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2e3900dc] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1583686310 wrapping conn0: url=jdbc:h2:mem:code_audit user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,category,name,code,pattern_type,severity,description,suggestion_template,executor_bean,enabled,is_builtin,class_id,create_time,update_time,is_deleted FROM rule WHERE is_deleted=0 AND (enabled = ?)
+==> Parameters: 1(Integer)
+<==    Columns: id, category, name, code, pattern_type, severity, description, suggestion_template, executor_bean, enabled, is_builtin, class_id, create_time, update_time, is_deleted
+<==        Row: 1, STYLE, 类名大驼�?, NAMING_CLASS_UPPERCAMEL, AST, WARNING, 类名应采用大驼峰命名（UpperCamelCase�?, <<BLOB>>, namingChecker, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 2, STYLE, 方法名小驼峰, NAMING_METHOD_LOWERCAMEL, AST, WARNING, 方法名应采用小驼峰命名（lowerCamelCase�?, <<BLOB>>, namingChecker, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 3, STYLE, 常量全大�?, NAMING_CONSTANT_UPPER_SNAKE, AST, WARNING, 常量名应全大�?+下划线分�?, <<BLOB>>, namingChecker, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 4, STYLE, 单行字符超长, STYLE_LINE_TOO_LONG, AST, SUGGESTION, 单行字符数建议不超过 120, <<BLOB>>, formatChecker, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 5, STYLE, 方法过长, STYLE_METHOD_TOO_LONG, AST, WARNING, 单个方法行数建议不超�? 80 �?, <<BLOB>>, structureChecker, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 6, DEFECT, 空指针风�?, DEFECT_NULL_POINTER, AST, ERROR, 变量可能�? null 但未做非空判断就调用方法, <<BLOB>>, nullPointerDetector, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 7, DEFECT, 资源未关�?, DEFECT_RESOURCE_LEAK, AST, ERROR, IO 流�?�数据库连接等资源未在使用后关闭, <<BLOB>>, resourceLeakDetector, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 8, DEFECT, �? catch �?, DEFECT_EMPTY_CATCH, AST, WARNING, catch 块为空，会吞掉异�?, <<BLOB>>, emptyCatchDetector, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 9, DEFECT, 捕获过宽异常, DEFECT_BROAD_CATCH, AST, WARNING, 直接捕获 Exception �? Throwable, <<BLOB>>, broadCatchDetector, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 10, DEFECT, 条件恒为�?, DEFECT_ALWAYS_TRUE, AST, ERROR, if/while 条件恒为 true（字面量 true、x==x 等）, <<BLOB>>, conditionDetector, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 11, DEFECT, 条件恒为�?, DEFECT_ALWAYS_FALSE, AST, WARNING, if/while 条件恒为 false（字面量 false、x!=x 等）, <<BLOB>>, conditionDetector, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 12, DEFECT, 潜在死循�?, DEFECT_INFINITE_LOOP, AST, ERROR, while(true)/for(;;) 循环体内未发�? break/return 等出�?, <<BLOB>>, infiniteLoopDetector, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 13, DEFECT, 不安全类型转�?, DEFECT_UNSAFE_CAST, AST, WARNING, 未经 instanceof 校验的强制类型转换，可能�? ClassCastException, <<BLOB>>, unsafeCastDetector, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 14, DEFECT, 遍历时修改集�?, DEFECT_CONCURRENT_MODIFICATION, AST, ERROR, �? for-each 循环中调�? add/remove/put 等修改方�?, <<BLOB>>, concurrentModDetector, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 15, DEFECT, 除零风险, DEFECT_DIVIDE_BY_ZERO, AST, ERROR, 除法/取模运算的右操作数为字面�? 0, <<BLOB>>, divideByZeroDetector, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 16, DEFECT, 浮点等�?�比�?, DEFECT_FLOAT_EQUALITY, AST, WARNING, 使用 == / != 比较 double/float 类型, <<BLOB>>, floatEqualityDetector, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 17, SECURITY, SQL 注入风险, SECURITY_SQL_INJECTION, REGEX, CRITICAL, 使用字符串拼接构�? SQL 语句，存�? SQL 注入风险, <<BLOB>>, sqlInjectionScanner, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 18, SECURITY, 硬编码密�?, SECURITY_HARDCODED_SECRET, REGEX, CRITICAL, 代码中出现明文密码�?�密钥�?�Token 等敏感信�?, <<BLOB>>, hardcodedSecretScanner, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 19, SECURITY, XSS 风险, SECURITY_XSS, REGEX, CRITICAL, 未转义的用户输入直接输出到页�?, <<BLOB>>, xssScanner, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 20, SECURITY, 命令注入, SECURITY_COMMAND_INJECTION, REGEX, CRITICAL, 用户输入拼接�? Runtime.exec() 等命令执行函�?, <<BLOB>>, commandInjectionScanner, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 21, SECURITY, 路径遍历, SECURITY_PATH_TRAVERSAL, REGEX, CRITICAL, 未校验的用户输入直接用于文件路径构�??, <<BLOB>>, pathTraversalScanner, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 22, SECURITY, 敏感信息日志, SECURITY_SENSITIVE_LOG, REGEX, WARNING, 日志/输出语句打印了密�?/Token/身份证等敏感字段, <<BLOB>>, sensitiveLogScanner, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 23, SECURITY, 不安全加�?, SECURITY_INSECURE_CRYPTO, REGEX, CRITICAL, 使用 MD5/SHA-1/DES/3DES 等已破解或不安全的算�?, <<BLOB>>, insecureCryptoScanner, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==        Row: 24, SECURITY, 反序列化风险, SECURITY_UNSAFE_DESERIALIZE, REGEX, CRITICAL, 对不可信输入使用 Java 原生/XML/Jackson default typing/YAML 反序列化, <<BLOB>>, unsafeDeserializeScanner, 1, 1, null, 2026-06-22 16:15:07.473608, 2026-06-22 16:15:07.473608, 0
+<==      Total: 24
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2e3900dc]
+2026-06-22 16:15:07.832 [main] WARN  c.c.service.impl.RuleServiceImpl - [RULE] Redis ˢ��ʧ�ܣ����ڴ滺����Ч: Cannot invoke "org.springframework.data.redis.serializer.RedisSerializer.serialize(Object)" because "this.keySerializer" is null
+2026-06-22 16:15:08.483 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
+2026-06-22 16:15:08.492 [main] INFO  com.codeaudit.CodeAuditApplication - Started CodeAuditApplication in 3.04 seconds (process running for 3.401)
+
+========================================
+  ���������ȱ�ݽ���ϵͳ �����ɹ�
+  API �ĵ�: http://localhost:8080/doc.html
+========================================
+

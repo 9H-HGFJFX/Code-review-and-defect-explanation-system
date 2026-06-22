@@ -1,19 +1,30 @@
 package com.codeaudit.engine.parser;
 
 import com.codeaudit.engine.ReviewContext;
-import com.codeaudit.common.exception.CodeParseException;
-import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
+import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.ast.CompilationUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
- * JavaParser 包装 - 解析 + 预处理（BOM 去除、换行统一）
+ * JavaParser 包装 - 解析 + 预处理（BOM 去除、换行统一）。
+ * 每次 parse 使用独立 Parser 实例 + 线程局部配置，避免全局状态污染（线程安全）。
  */
 @Slf4j
 @Component
 public class JavaCodeParser {
+
+    /** 线程局部 Parser，复用以获得更佳性能（JavaParser 本身线程不安全） */
+    private final ThreadLocal<JavaParser> parserHolder = ThreadLocal.withInitial(() -> {
+        ParserConfiguration cfg = new ParserConfiguration()
+                .setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17)
+                .setAttributeComments(false);
+        return new JavaParser(cfg);
+    });
 
     public ReviewContext parse(String rawCode, String fileName) {
         if (rawCode == null) rawCode = "";
@@ -32,17 +43,12 @@ public class JavaCodeParser {
                 .fileName(fileName);
 
         try {
-            StaticJavaParser.Config config = new StaticJavaParser.Config()
-                    .setLanguageLevel(com.github.javaparser.ParserConfiguration.LanguageLevel.JAVA_17);
-            StaticJavaParser.setConfiguration(config);
-            ParseResult<CompilationUnit> result = new com.github.javaparser.JavaParser(config).parse(code);
+            ParseResult<CompilationUnit> result = parserHolder.get().parse(code);
             if (!result.isSuccessful() || result.getResult().isEmpty()) {
-                String msg = result.getProblems().stream()
-                        .findFirst()
-                        .map(p -> p.getMessage())
-                        .orElse("语法错误");
-                log.warn("[PARSE_FAIL] file={} msg={}", fileName, msg);
-                b.parseError(msg);
+                AtomicReference<String> msg = new AtomicReference<>("语法错误");
+                result.getProblems().stream().findFirst().ifPresent(p -> msg.set(p.getMessage()));
+                log.warn("[PARSE_FAIL] file={} msg={}", fileName, msg.get());
+                b.parseError(msg.get());
             } else {
                 b.compilationUnit(result.getResult().get());
             }

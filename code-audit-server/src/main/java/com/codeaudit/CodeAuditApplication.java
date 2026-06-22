@@ -11,7 +11,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 @EnableAsync
 @EnableScheduling
-@SpringBootApplication
+@SpringBootApplication(exclude = {
+        org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration.class
+})
 @MapperScan("com.codeaudit.repository")
 public class CodeAuditApplication {
 

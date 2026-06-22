@@ -179,7 +179,6 @@ public class RuleServiceImpl implements RuleService {
         r.setCategory(req.getCategory());
         r.setSeverity(req.getSeverity());
         r.setPatternType(req.getPatternType());
-        r.setPattern(req.getPattern());
         r.setDescription(req.getDescription());
         r.setSuggestionTemplate(req.getSuggestionTemplate());
         r.setExecutorBean(req.getExecutorBean());

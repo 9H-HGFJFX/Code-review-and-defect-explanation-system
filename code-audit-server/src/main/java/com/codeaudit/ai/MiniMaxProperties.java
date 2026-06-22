@@ -5,11 +5,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * MiniMax M3 API 配置
+ * MiniMax M3 API 配置。
+ * Spring Boot 3 要求配置 key 是 kebab-case 小写；这里用 minimax 兼容现有 application.yml。
  */
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "MiniMax")
+@ConfigurationProperties(prefix = "minimax")
 public class MiniMaxProperties {
     private String apiKey;
     private String baseUrl = "https://api.MiniMax.chat/v1";

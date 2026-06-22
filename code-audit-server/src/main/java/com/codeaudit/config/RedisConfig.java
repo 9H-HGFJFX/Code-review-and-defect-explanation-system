@@ -5,14 +5,17 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
- * Redis 配置 - 规则缓存 + JWT 黑名单 + 发布订阅
+ * Redis 配置 - 规则缓存 + JWT 黑名单 + 发布订阅。
+ * 仅在非 test profile 下生效；test profile 由 NoOpRedisConfig 接管。
  */
+@Profile("!test")
 @Configuration
 public class RedisConfig {
 

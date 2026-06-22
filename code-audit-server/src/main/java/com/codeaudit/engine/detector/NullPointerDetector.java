@@ -5,6 +5,7 @@ import com.codeaudit.engine.ReviewContext;
 import com.codeaudit.engine.executor.RuleExecutor;
 import com.codeaudit.entity.Rule;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;

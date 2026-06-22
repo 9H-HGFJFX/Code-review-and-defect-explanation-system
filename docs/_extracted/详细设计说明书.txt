@@ -1,0 +1,295 @@
+=== 详细设计说明书.docx ===
+
+代码审查与缺陷解释系统
+详细设计说明书
+版本：V1.0
+日期：2026-06-17
+状态：初稿
+1. 引言
+1.1 编写目的
+本文档在概要设计的基础上，对系统各模块进行详细设计，包括类设计、接口定义、核心算法、数据结构、异常处理等。为编码实现提供精确的技术规范。
+1.2 适用范围
+本文档适用于系统开发团队的后端开发人员、前端开发人员及测试人员。开发人员应根据本文档进行编码实现，测试人员应根据本文档编写单元测试和集成测试用例。
+1.3 设计约定
+包命名：com.codeaudit.{module}
+类命名：采用大驼峰命名（PascalCase）
+方法命名：采用小驼峰命名（camelCase）
+常量命名：全部大写+下划线分隔（UPPER_SNAKE_CASE）
+数据库表命名：小写+下划线分隔，复数形式
+RESTful URL：小写+连字符分隔
+2. 后端详细设计
+2.1 项目结构
+后端采用Spring Boot多模块项目结构，遵循“控制层-服务层-数据访问层”的分层架构：
+code-audit-server/
+├── src/main/java/com/codeaudit/
+│   ├── CodeAuditApplication.java          # 启动类
+│   ├── config/                            # 配置类
+│   │   ├── SecurityConfig.java            # Spring Security配置
+│   │   ├── JwtConfig.java                 # JWT配置
+│   │   ├── CorsConfig.java                # 跨域配置
+│   │   └── RedisConfig.java               # Redis配置
+│   ├── controller/                        # 控制器层
+│   │   ├── AuthController.java            # 认证接口
+│   │   ├── ReviewController.java          # 审查接口
+│   │   ├── RuleController.java            # 规则管理接口
+│   │   ├── StatsController.java           # 统计接口
+│   │   └── UserController.java            # 用户管理接口
+│   ├── service/                           # 服务层
+│   │   ├── ReviewService.java             # 审查服务
+│   │   ├── RuleService.java               # 规则服务
+│   │   ├── UserService.java               # 用户服务
+│   │   └── ReportService.java             # 报告生成服务
+│   ├── service/impl/                      # 服务实现
+│   ├── engine/                            # 审查引擎
+│   │   ├── ReviewEngine.java              # 引擎主控
+│   │   ├── parser/                        # 代码解析
+│   │   ├── checker/                       # 检查器
+│   │   ├── detector/                      # 检测器
+│   │   └── scanner/                       # 扫描器
+│   ├── repository/                        # 数据访问层
+│   ├── entity/                            # 实体类
+│   ├── dto/                               # 数据传输对象
+│   ├── vo/                                # 视图对象
+│   ├── common/                            # 公共类
+│   │   ├── Result.java                    # 统一响应
+│   │   ├── PageResult.java                # 分页响应
+│   │   └── exception/                     # 异常定义
+│   └── util/                              # 工具类
+└── src/main/resources/
+    ├── application.yml                    # 主配置
+    └── db/migration/                      # 数据库迁移脚本
+3. 核心类设计
+3.1 审查引擎核心类
+3.1.1 ReviewEngine（引擎主控类）
+3.1.2 CodeChecker（规范检查器接口）
+3.1.3 NamingChecker（命名检查器）
+实现CodeChecker接口，负责检查命名规范：
+类名检查：使用正则 ^[A-Z][a-zA-Z0-9]*$ 验证大驼峰命名
+方法名检查：使用正则 ^[a-z][a-zA-Z0-9]*$ 验证小驼峰命名
+常量名检查：使用正则 ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$ 验证全大写+下划线
+变量名检查：长度≥3字符，避免单字母变量名（循环变量除外）
+3.1.4 DefectDetector（缺陷检测器接口）
+3.1.5 NullPointerDetector（空指针检测器）
+实现DefectDetector接口，检测空指针风险：
+遍历所有方法调用表达式（MethodCallExpr）
+检查调用对象是否在调用前进行了null判断
+追踪变量的赋值来源，判断是否为可能为null的返回值
+对未判空的调用生成Issue，严重级别=ERROR
+3.1.6 SecurityScanner（安全扫描器接口）
+4. 前端详细设计
+4.1 项目结构
+前端采用Vue3 + TypeScript + Vite构建，项目结构如下：
+code-audit-web/
+├── src/
+│   ├── api/                    # API接口封装
+│   │   ├── auth.ts             # 认证接口
+│   │   ├── review.ts           # 审查接口
+│   │   ├── rule.ts             # 规则接口
+│   │   └── stats.ts            # 统计接口
+│   ├── components/             # 通用组件
+│   │   ├── CodeEditor.vue      # 代码编辑器
+│   │   ├── IssueCard.vue       # 问题卡片
+│   │   ├── ReportViewer.vue    # 报告查看器
+│   │   └── StatsChart.vue      # 统计图表
+│   ├── views/                  # 页面视图
+│   │   ├── HomeView.vue        # 首页（代码提交）
+│   │   ├── ReviewView.vue      # 审查结果页
+│   │   ├── HistoryView.vue     # 历史记录页
+│   │   ├── RulesView.vue       # 规则管理页
+│   │   ├── StatsView.vue       # 数据统计页
+│   │   └── LoginView.vue       # 登录页
+│   ├── router/                 # 路由配置
+│   ├── store/                  # Pinia状态管理
+│   ├── types/                  # TypeScript类型定义
+│   └── utils/                  # 工具函数
+├── package.json
+└── vite.config.ts
+4.2 核心组件设计
+4.2.1 CodeEditor（代码编辑器组件）
+4.2.2 IssueCard（问题卡片组件）
+4.2.3 ReportViewer（报告查看器组件）
+4.3 路由设计
+4.4 状态管理（Pinia Store）
+4.4.1 useAuthStore（认证状态）
+4.4.2 useReviewStore（审查状态）
+5. 核心算法
+5.1 代码行数校验算法
+在代码提交时，前端和后端分别执行行数校验：
+前端：使用Monaco Editor的getModel().getLineCount()获取行数
+前端：若行数>500，阻止提交并显示红色警告提示
+后端：对接收到的代码文本按\n分割，计算数组长度
+后端：若行数>500，返回HTTP 400错误码及提示信息
+文件上传：在上传前读取文件内容，预检行数
+5.2 AST解析流程
+使用JavaParser库进行代码解析，流程如下：
+代码预处理：移除BOM头，统一换行符为\n
+语法解析：调用JavaParser.parse(code)获取CompilationUnit
+解析异常处理：若解析失败（语法错误），记录解析错误并终止后续检查
+获取AST节点：从CompilationUnit中获取类型声明、方法声明、字段声明等
+节点遍历：使用VoidVisitorAdapter对AST进行深度优先遍历
+5.3 问题严重级别排序算法
+审查结果中的问题按以下优先级排序：
+第一优先级：严重（CRITICAL）—— 安全漏洞类问题
+第二优先级：错误（ERROR）—— 逻辑缺陷、空指针等
+第三优先级：警告（WARNING）—— 规范违规、异常处理等
+第四优先级：建议（SUGGESTION）—— 代码风格、可读性等
+同级别内按行号升序排列
+5.4 报告生成算法
+报告生成采用模板引擎+数据填充的方式：
+准备报告模板（HTML模板，支持中文排版）
+填充审查概要：时间、文件名、行数、问题统计
+按严重级别分组渲染问题列表
+安全提示专区独立渲染，使用红色/橙色高亮样式
+使用Puppeteer/Playwright将HTML转换为PDF
+使用docx库直接生成Word格式报告
+6. 异常处理设计
+6.1 异常分类
+6.2 全局异常处理
+使用@ControllerAdvice实现全局异常拦截：
+@ExceptionHandler注解捕获各类业务异常
+统一转换为Result格式的错误响应
+记录异常日志（包含堆栈信息、请求参数、用户信息）
+生产环境不向前端暴露堆栈详情
+7. 测试设计
+7.1 单元测试
+使用JUnit 5 + Mockito进行单元测试，覆盖以下核心模块：
+7.2 测试用例示例
+7.2.1 命名检查测试用例
+测试类名不符合大驼峰命名的情况：
+输入代码：public class my_class { }
+预期输出：Issue { severity=WARNING, message=“类名'my_class'不符合大驼峰命名规范” }
+7.2.2 空指针检测测试用例
+测试未判空直接调用方法的情况：
+输入代码：String s = getValue(); int len = s.length();
+预期输出：Issue { severity=ERROR, message=“变量's'可能为null，建议在使用前进行null判断” }
+7.2.3 SQL注入检测测试用例
+测试字符串拼接构造SQL的情况：
+输入代码：String sql = "SELECT * FROM users WHERE name='" + name + "'";
+预期输出：Issue { severity=CRITICAL, message=“检测到SQL注入风险：使用字符串拼接构造SQL语句” }
+7.3 集成测试
+使用Spring Boot Test + TestRestTemplate进行API集成测试
+测试完整的代码提交→审查→报告生成流程
+使用H2内存数据库进行测试，确保测试隔离性
+测试认证拦截：未携带Token的请求应返回401
+8. 部署说明
+8.1 环境要求
+8.2 部署步骤
+传统部署：
+安装JDK 17、Node.js 24、MySQL 8.0、Redis 7.0
+创建MySQL数据库 code_audit，执行初始化SQL脚本
+修改application.yml中的数据库连接和Redis连接配置
+执行 mvn clean package 构建后端JAR包
+执行 npm run build 构建前端静态资源
+配置Nginx反向代理规则，指向后端服务和前端静态目录
+启动后端：java -jar code-audit-server.jar
+启动Nginx
+Docker部署：
+确保已安装Docker和Docker Compose
+修改docker-compose.yml中的环境变量
+执行 docker-compose up -d 启动所有服务
+执行 docker-compose ps 验证服务状态
+
+--- TABLE ---
+属性/方法 | 类型 | 说明
+- ruleCache: Map<String, List<Rule>> | 属性 | 规则缓存，按类别分组
+- checkers: List<CodeChecker> | 属性 | 规范检查器列表
+- detectors: List<DefectDetector> | 属性 | 缺陷检测器列表
+- scanners: List<SecurityScanner> | 属性 | 安全扫描器列表
++ review(code: String): ReviewResult | 方法 | 执行完整代码审查
++ loadRules(): void | 方法 | 从数据库加载启用的规则
++ refreshRules(): void | 方法 | 刷新规则缓存（热更新）
+
+--- TABLE ---
+方法 | 参数 | 返回 | 说明
+check | CompilationUnit cu, Rule rule | List<Issue> | 对AST执行单条规则检查
+getCategory |  | String | 返回检查器所属类别
+supports | Rule rule | boolean | 判断是否支持该规则
+
+--- TABLE ---
+方法 | 参数 | 返回 | 说明
+detect | CompilationUnit cu | List<Issue> | 执行缺陷检测
+getDefectType |  | String | 返回检测的缺陷类型
+
+--- TABLE ---
+方法 | 参数 | 返回 | 说明
+scan | CompilationUnit cu, String sourceCode | List<Issue> | 执行安全扫描
+getRiskType |  | String | 返回安全风险类型
+
+--- TABLE ---
+属性/事件 | 类型 | 说明
+modelValue | String (v-model) | 代码内容
+language | String (默认 'java') | 编程语言
+readOnly | Boolean (默认 false) | 是否只读
+maxLines | Number (默认 500) | 最大行数限制
+@update:modelValue | 事件 | 代码内容变更
+@lineCountExceeded | 事件 | 超出最大行数限制
+
+--- TABLE ---
+属性/事件 | 类型 | 说明
+issue | Issue (必填) | 问题数据对象
+showCode | Boolean (默认 true) | 是否显示代码对比
+@fix | 事件 | 用户点击应用修复建议
+
+--- TABLE ---
+属性/事件 | 类型 | 说明
+reviewResult | ReviewResult (必填) | 审查结果数据
+exportable | Boolean (默认 true) | 是否允许导出
+@export | 事件(format: 'pdf'|'docx') | 导出报告
+
+--- TABLE ---
+路径 | 组件 | 权限 | 说明
+/ | HomeView | 所有用户 | 首页，代码提交入口
+/review/:id | ReviewView | 所有用户 | 审查结果详情
+/history | HistoryView | 所有用户 | 历史审查记录
+/rules | RulesView | 教师/管理员 | 规则管理
+/stats | StatsView | 教师/管理员 | 数据统计看板
+/login | LoginView | 未登录 | 登录页面
+/register | LoginView | 未登录 | 注册页面
+
+--- TABLE ---
+属性/方法 | 类型 | 说明
+token | string | null | JWT Token
+user | User | null | 当前用户信息
+isLoggedIn | computed boolean | 是否已登录
+login(username, password) | async method | 登录
+logout() | method | 登出
+fetchUser() | async method | 获取用户信息
+
+--- TABLE ---
+属性/方法 | 类型 | 说明
+currentReview | ReviewResult | null | 当前审查结果
+history | ReviewSummary[] | 历史记录列表
+isReviewing | boolean | 是否正在审查中
+submitCode(code, fileName) | async method | 提交代码审查
+fetchHistory(page, size) | async method | 获取历史记录
+exportReport(id, format) | async method | 导出报告
+
+--- TABLE ---
+异常类型 | HTTP状态码 | 说明 | 处理方式
+CodeParseException | 400 | 代码语法错误，无法解析 | 返回解析错误详情，提示用户修正
+CodeTooLargeException | 400 | 代码超过500行限制 | 返回行数限制提示
+RuleNotFoundException | 404 | 规则不存在 | 返回规则ID无效提示
+UnauthorizedException | 401 | 未认证或Token过期 | 返回登录页面
+ForbiddenException | 403 | 权限不足 | 返回权限不足提示
+ReviewNotFoundException | 404 | 审查记录不存在 | 返回记录不存在提示
+ReportGenerateException | 500 | 报告生成失败 | 记录错误日志，返回重试提示
+SystemException | 500 | 系统内部错误 | 记录错误日志，返回通用错误提示
+
+--- TABLE ---
+测试类 | 测试目标 | 用例数(预计) | 覆盖率目标
+NamingCheckerTest | 命名规范检查器 | 15 | ≥85%
+NullPointerDetectorTest | 空指针检测器 | 10 | ≥80%
+SQLInjectionScannerTest | SQL注入扫描器 | 8 | ≥85%
+ReviewServiceTest | 审查服务 | 12 | ≥80%
+RuleServiceTest | 规则管理服务 | 10 | ≥80%
+ReportServiceTest | 报告生成服务 | 6 | ≥75%
+
+--- TABLE ---
+组件 | 版本要求 | 说明
+JDK | 17+ | Java运行环境
+Node.js | 24+ | 前端构建工具
+MySQL | 8.0+ | 主数据库
+Redis | 7.0+ | 缓存服务
+Nginx | 1.24+ | 反向代理
+Docker | 24+ | 容器化部署（可选）
+Docker Compose | 2.20+ | 容器编排（可选）
