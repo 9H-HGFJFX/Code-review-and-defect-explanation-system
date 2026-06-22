@@ -1,0 +1,73 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: code-review-system
+  
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/code_review_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root123456
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 
+      database: 0
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# JWT Configuration
+jwt:
+  secret: CodeReviewSystemSecretKey2024MustBeAtLeast256BitsLong
+  access-token-expiration: 7200000  # 2 hours in milliseconds
+  refresh-token-expiration: 604800000  # 7 days in milliseconds
+
+# Code Review Engine Configuration
+review:
+  engine:
+    max-lines: 5000
+    min-lines: 1
+    sync-threshold: 500  # Code lines less than this will be processed synchronously
+    timeout-seconds: 30
+  thread-pool:
+    core-pool-size: 5
+    max-pool-size: 20
+    queue-capacity: 100
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.codereview: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  logback:
+    rollingpolicy:
+      max-history: 30
+
+# Knife4j Configuration
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
