@@ -1,0 +1,67 @@
+{
+  "last_cycle": [
+    {
+      "task_id": "verifier-review",
+      "verdict": "reject",
+      "reason": "Verifier发现7个问题，其中2个高优先级必须修复：①任务状态枚举Worker3/Worker4不一致（缺FAILED，无整数字符串映射）；②Worker4业务错误码与Worker5内部异常错误码重叠。"
+    }
+  ],
+  "next_cycle": [
+    {
+      "task_id": "fix-enum-task-status",
+      "title": "Worker3+Worker4修复：任务状态枚举统一映射",
+      "prompt": "问题：任务状态枚举在数据库层（Worker3: 0=创建/1=扫描中/2=完成/3=失败）和API层（Worker4: PENDING/IN_PROGRESS/COMPLETED，无FAILED）不一致，且无整数值映射。\n\n修复要求：\n1. Worker3（E:\\Desktop\\version\\outputs\\worker3-database.md）：review_task表字段说明补充整数值→字符串完整映射表：\n   0=PENDING（已创建）, 1=IN_PROGRESS（扫描中）, 2=COMPLETED（完成）, 3=FAILED（失败）\n\n2. Worker4（E:\\Desktop\\version\\outputs\\worker4-api.md）：第5.2.2节补充：\n   - 新增状态值 FAILED\n   - 补充任务状态整数值与字符串映射表\n   - 更新状态流转图，添加 PENDING→IN_PROGRESS→COMPLETED/FAILED 两条路径\n\n完成后通知 codesystem-leader。",
+      "assigned_to": "codesystem-db",
+      "verified_by": "codesystem-verifier",
+      "verify_prompt": "校验 E:\\Desktop\\version\\outputs\\worker3-database.md 和 worker4-api.md：\n1. 确认任务状态枚举0=PENDING/1=IN_PROGRESS/2=COMPLETED/3=FAILED全文统一\n2. 确认Worker4状态流转图包含FAILED分支\n3. 确认Worker3数据库注释与Worker4 API字符串枚举完全对应",
+      "timeout_ms": 600000
+    },
+    {
+      "task_id": "fix-error-codes",
+      "title": "Worker4+Worker5修复：错误码体系对齐",
+      "prompt": "问题：Worker4定义了业务错误码体系（1000=未认证, 1001-1999=业务校验, 2000-2999=任务, 3000-3999=缺陷, 4000-4999=规则, 9000-9999=系统），但Worker5的内部异常错误码（1000=Unauthorized, 1002=Forbidden, 9001=熔断）与Worker4重叠冲突。\n\n修复要求：\n1. Worker5（E:\\Desktop\\version\\outputs\\worker5-ops.md）第7章异常处理部分：明确声明内部异常错误码对外不暴露，统一继承Worker4业务错误码体系。修正如下：\n   - UnauthorizedException: 使用 Worker4 错误码 1000\n   - ForbiddenException: 使用 Worker4 错误码 1002\n   - CircuitBreakerException: 使用 Worker4 错误码 9001（已对齐）\n   - ExternalServiceException: 使用 Worker4 错误码 9002（已对齐）\n   - 添加说明：本系统错误码体系以Worker4第5章为准，Worker5内部异常仅为实现细节\n\n2. Worker4（E:\\Desktop\\version\\outputs\\worker4-api.md）附录或错误码章节：补充以下异常错误码定义：\n   9001 = 服务熔断中（CircuitBreakerException）\n   9002 = 外部服务异常（ExternalServiceException）\n\n完成后通知 codesystem-leader。",
+      "assigned_to": "codesystem-ops",
+      "verified_by": "codesystem-verifier",
+      "verify_prompt": "校验 E:\\Desktop\\version\\outputs\\worker5-ops.md 和 worker4-api.md：\n1. 确认Worker5异常错误码已与Worker4业务错误码体系对齐\n2. 确认无错误码重叠（1000/1002/9001/9002）\n3. 确认Worker4补充了9001/9002异常定义",
+      "timeout_ms": 600000
+    },
+    {
+      "task_id": "fix-enum-issue-status",
+      "title": "Worker3+Worker4修复：缺陷状态枚举对齐",
+      "prompt": "问题：缺陷状态枚举在数据库层（Worker3: 0=未处理/1=已分配/2=已修复/3=已关闭）和API层（Worker4: OPEN/ASSIGNED/RESOLVED/CLOSED）语义不对齐，UNASSIGNED vs OPEN有歧义。\n\n修复要求：\n1. Worker3（E:\\Desktop\\version\\outputs\\worker3-database.md）：issue表字段说明补充整数值→字符串完整映射表：\n   0=OPEN（未处理/开放）, 1=ASSIGNED（已分配）, 2=RESOLVED（已修复）, 3=CLOSED（已关闭）\n\n2. Worker4（E:\\Desktop\\version\\outputs\\worker4-api.md）：第5.2.3节补充缺陷状态整数值映射表，与Worker3保持一致。\n\n完成后通知 codesystem-leader。",
+      "assigned_to": "codesystem-db",
+      "verified_by": "codesystem-verifier",
+      "verify_prompt": "校验 worker3-database.md 和 worker4-api.md：\n1. 确认缺陷状态枚举0=OPEN/1=ASSIGNED/2=RESOLVED/3=CLOSED全文统一\n2. 确认数据库层与API层枚举语义完全对齐",
+      "timeout_ms": 600000
+    },
+    {
+      "task_id": "fix-enum-severity",
+      "title": "Worker4修复：缺陷严重程度枚举补充整数值映射",
+      "prompt": "问题：缺陷严重程度枚举（CRITICAL/HIGH/MEDIUM/LOW）数据库层有整数值（1/2/3/4），但API层仅有字符串枚举，缺少整数值映射文档。\n\n修复要求：Worker4（E:\\Desktop\\version\\outputs\\worker4-api.md）第5.2.3节补充：\n缺陷严重程度整数值与字符串映射表：\n1=CRITICAL（严重）, 2=HIGH（高）, 3=MEDIUM（中）, 4=LOW（低）\n\n完成后通知 codesystem-leader。",
+      "assigned_to": "codesystem-api",
+      "verified_by": "codesystem-verifier",
+      "verify_prompt": "校验 worker4-api.md：\n确认严重程度枚举1=CRITICAL/2=HIGH/3=MEDIUM/4=LOW整数值映射已补充",
+      "timeout_ms": 600000
+    },
+    {
+      "task_id": "fix-robustness",
+      "title": "Worker2+Worker5修复：补充健壮性兜底方案",
+      "prompt": "问题：审查引擎健壮性描述缺少两项关键兜底方案。\n\n修复要求：\n1. Worker5（E:\\Desktop\\version\\outputs\\worker5-ops.md）第7章补充：\n   - 规则加载失败降级策略：fail-mode=log-and-skip（加载失败时跳过该规则并记录ERROR日志，不阻止扫描启动）\n   - AST解析异常兜底：单文件解析异常→记录跳过→继续处理其他文件→返回部分结果+解析失败文件列表\n\n2. Worker2（E:\\Desktop\\version\\outputs\\worker2-module\\worker2-module.md）第3章调度管理模块补充：\n   - AST解析异常兜底策略描述\n\n完成后通知 codesystem-leader。",
+      "assigned_to": "codesystem-ops",
+      "verified_by": "codesystem-verifier",
+      "verify_prompt": "校验 worker5-ops.md 和 worker2-module\\worker2-module.md：\n1. 确认规则加载失败降级策略（log-and-skip）已补充\n2. 确认AST解析异常兜底方案（单文件异常→记录跳过→返回失败列表）已补充",
+      "timeout_ms": 600000
+    },
+    {
+      "task_id": "fix-arch-alignment",
+      "title": "Worker2修复：架构分层对齐Worker1",
+      "prompt": "问题：Worker1定义了5层架构（前端展示层/BFF适配层/业务服务层/审查引擎层/数据层），但Worker2模块设计只描述了4层，缺少BFF和审查引擎的独立模块归属说明。\n\n修复要求：Worker2（E:\\Desktop\\version\\outputs\\worker2-module\\worker2-module.md）第3.1节模块结构图补充：\n明确标注7个模块在各层的归属：\n- BFF适配层：包含API网关模块（接收外部请求、路由、认证）\n- 审查引擎层：包含代码解析模块、规则引擎模块、缺陷检测模块、报告生成模块\n- 业务服务层：包含提交管理模块、调度管理模块\n- 数据层：数据访问（通过ORM层）\n\n完成后通知 codesystem-leader。",
+      "assigned_to": "codesystem-module",
+      "verified_by": "codesystem-verifier",
+      "verify_prompt": "校验 worker2-module\\worker2-module.md：\n1. 确认模块结构图已补充BFF适配层和审查引擎层的独立描述\n2. 确认7个模块在各层的归属与Worker1的5层架构完全对齐",
+      "timeout_ms": 600000
+    }
+  ],
+  "plan_complete": false,
+  "message_to_user": "Cycle 3 Verifier 全文校验完成。发现7个问题：2个高优先级（任务状态枚举不一致+错误码重叠）必须修复，其余5个中低优先级问题同步修复。已分发6个修复任务给 Worker2/3/4/5，并行处理后再次提交Verifier校验。"
+}

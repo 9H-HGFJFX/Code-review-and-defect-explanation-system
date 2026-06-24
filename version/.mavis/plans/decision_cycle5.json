@@ -1,0 +1,31 @@
+{
+  "last_cycle": [
+    {
+      "task_id": "track-c-api",
+      "verdict": "reject",
+      "reason": "pom.xml artifact已修复，但仍有~3个自身bug：JwtTokenProvider.java缺少JwtUserDetails的import、存在重复序列化类（standalone文件和DataMaskingUtil.java内部类冲突）。"
+    }
+  ],
+  "next_cycle": [
+    {
+      "task_id": "track-c-api",
+      "title": "Track C - 修复编译错误（import缺失 + 重复类）",
+      "prompt": "项目根目录：E:\\Desktop\\version\n\nCycle 4 验证报告发现了以下编译错误（除了pom.xml已修复外）：\n\n**Track C 自身问题（需修复）：**\n1. JwtTokenProvider.java：缺少 `JwtUserDetails` 的 import 语句\n2. 存在重复的序列化类：PhoneMaskSerializer 和 EmailMaskSerializer 既作为独立文件存在，又在 DataMaskingUtil.java 中作为内部类定义，产生冲突\n\n**Track A 脚手架问题（由 verifier 发现，需 Track A agent 修复，但 Track C 需等待修复后才能验证通过）：**\n3. ReviewTaskService、IssueService、RuleService：定义为普通 class 而非 interface，导致 implements 失败\n4. ClassInfo entity：缺失或字段错误\n5. 重复的序列化类文件\n\n**请完成以下修复：**\n1. 在 JwtTokenProvider.java 中添加缺失的 `JwtUserDetails` import\n2. 删除重复的序列化类（如果 DataMaskingUtil.java 中已有内部类，则删除独立的 PhoneMaskSerializer.java 和 EmailMaskSerializer.java 文件）\n3. 确认所有 Service 接口定义正确（interface 而非 class）\n4. 确认 ClassInfo entity 存在且字段正确\n5. 修复完成后，运行 `mvn compile` 确认编译成功（0 错误）\n6. 在 E:\\Desktop\\version\\outputs\\plan_25b136f2\\track-c-deliverable.md 写入修复摘要\n\n注意：不要修改其他模块的代码。只修复上述问题。",
+      "assigned_to": "code-agent2-im",
+      "verified_by": "verifier",
+      "verify_prompt": "在 E:\\Desktop\\version 目录运行 `mvn compile`，确认编译成功（0 错误）。检查 JwtTokenProvider.java 是否包含 JwtUserDetails 的 import。检查是否存在重复的序列化类文件（PhoneMaskSerializer.java 和 EmailMaskSerializer.java 应只在 DataMaskingUtil.java 内部存在，不应有独立文件）。",
+      "timeout_ms": 1800000
+    },
+    {
+      "task_id": "track-a-scaffold-fix",
+      "title": "Track A - 修复脚手架问题（Service接口 + ClassInfo + 重复类）",
+      "prompt": "项目根目录：E:\\Desktop\\version\n\nCycle 4 验证报告发现 Track A 脚手架存在以下真实问题（这些是 Track C 验证失败的根本原因之一）：\n\n**必须修复的问题：**\n1. **Service 接口问题**：ReviewTaskService、IssueService、RuleService 定义为了普通 class 而非 interface。请检查 src/main/java 目录，确保这些是 interface 而不是 class。\n2. **ClassInfo entity 缺失/错误**：检查 src/main/java/com/codereview/entity 目录，确保 ClassInfo.java 存在且包含正确的字段（id、name、description、createdAt 等）。\n3. **重复序列化类文件**：检查 src/main/java/com/codereview/common/util 或 serializer 目录，如果 DataMaskingUtil.java 中已定义了 PhoneMaskSerializer 和 EmailMaskSerializer 作为内部类，则删除独立的 PhoneMaskSerializer.java 和 EmailMaskSerializer.java 文件，避免重复定义。\n4. **确保 init.sql 两阶段建表正确**：外键通过 ALTER TABLE 添加，外键顺序正确。\n\n**修复完成后：**\n1. 运行 `mvn compile` 确认编译成功\n2. 在 E:\\Desktop\\version\\outputs\\plan_25b136f2\\track-a-scaffold-fix-deliverable.md 写入修复摘要\n\n只修复上述脚手架问题，不要修改业务逻辑代码。",
+      "assigned_to": "code-agent3-team",
+      "verified_by": "verifier",
+      "verify_prompt": "在 E:\\Desktop\\version 目录运行 `mvn compile`，确认编译成功（0 错误）。确认 ReviewTaskService、IssueService、RuleService 是 interface 而非 class。确认 ClassInfo.java entity 存在且字段正确。确认没有重复的序列化类文件（独立文件 vs 内部类冲突）。",
+      "timeout_ms": 1800000
+    }
+  ],
+  "plan_complete": false,
+  "message_to_user": "Cycle 5：Track C 继续修复 import 缺失 + 重复类问题；Track A 补修脚手架问题（Service 接口应为 interface 而非 class、ClassInfo entity、重复序列化类）。两个问题独立并行修，修完后统一验证。"
+}

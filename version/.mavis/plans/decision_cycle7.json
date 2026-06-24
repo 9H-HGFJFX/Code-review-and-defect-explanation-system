@@ -1,0 +1,36 @@
+{
+  "last_cycle": [
+    {
+      "task_id": "track-c-api",
+      "verdict": "manual_retry",
+      "reason": "我已直接修复：TaskStatus(添加getCode/fromCode/canTransitionTo/RUNNING/PARTIAL_COMPLETED)、IssueStatus(添加NEW+name/description)、IssueSeverity(添加name/description)、BusinessException(添加ErrorCode构造函数)、ReviewTask entity(添加Lombok+缺失字段)、ReviewTaskService(重写匹配接口)。但仍有RuleController签名不匹配、Result.success()方法、ScanScheduler/PythonParser等问题需要继续修。"
+    },
+    {
+      "task_id": "track-a-scaffold-fix",
+      "verdict": "manual_retry",
+      "reason": "已修好TaskStatus/IssueStatus/IssueSeverity/BusinessException/ReviewTask entity/ReviewTaskService。需要继续修：RuleService签名不匹配、Result.success()方法、ReportGenerator的toJSONString参数、ScanScheduler/PythonParser等。"
+    }
+  ],
+  "next_cycle": [
+    {
+      "task_id": "track-c-api",
+      "title": "Track C - 修复剩余编译错误",
+      "prompt": "项目根目录：E:\\Desktop\\version\n\n我已直接修复了以下根本问题（enum/exception/entity/service层），你现在需要修复剩余的编译错误：\n\n**已修复的问题：**\n- TaskStatus enum：添加了getCode()/fromCode(int)/fromName(String)/canTransitionTo()/RUNNING/PARTIAL_COMPLETED常量\n- IssueStatus enum：添加了NEW常量、getCode()/getName()方法\n- IssueSeverity enum：添加了getName()/getDescription()方法\n- BusinessException：添加了ErrorCode参数的构造函数\n- ReviewTask entity：添加了@Builder/@AllArgsConstructor、name/description/creatorId/startTime/endTime/deadline等字段\n- ReviewTaskService：重写匹配ReviewTaskServiceInterface接口\n\n**仍需修复的编译错误（按文件）：**\n\n1. **RuleController.java** - RuleService方法签名不匹配：\n   - `getRuleList(PageRequest, Boolean, String)` → 应改为 `(PageRequest)`\n   - `createRule(CreateRuleRequest, Long)` → 应改为 `(CreateRuleRequest, Long)` 返回Long\n   - `updateRule(Long, UpdateRuleRequest, Long)` → 应改为 `(Long, UpdateRuleRequest, Long)`\n   - `toggleRule(Long, Boolean, Long)` → 应改为 `(Long, Boolean)`\n   修复方式：在RuleService中添加对应的方法签名。\n\n2. **ReportGenerator.java:109** - `JSON.toJSONString(map, boolean)` 签名错误\n   fastjson2的toJSONString不接受boolean第二个参数，改为 `JSON.toJSONString(map)` 或 `JSON.toJSONString(map, JSONWriter.Feature.PrettyFormat)`\n\n3. **RuleEngine.java:234** - `detectMagicNumber` 方法签名少一个参数\n   改为调用 `detectMagicNumber(sourceFile, rule, null)`\n\n4. **ScanScheduler.java:381** - String无法转换为ProgrammingLanguage\n   检查代码，可能需要添加转换逻辑\n\n5. **ScanScheduler.java:432-435** - TaskStatus与Integer不兼容、RUNNING/PARTIAL_COMPLETED常量、setStartTime\n   这些已由我修复的TaskStatus解决，但ScanScheduler的引用可能需要调整\n\n6. **ScanTaskQueue.java:95** - 类型转换问题\n   检查泛型类型\n\n7. **PythonParser.java:103** - ParseResult缺少getSuccess()方法\n   可能需要添加此方法或使用其他方法名\n\n8. **JavaParser.java:65** - COMPILER_NONNULLBYDEFAULT不存在\n   改为 `JavaCore.COMPILER_NONNULL` 或移除\n\n9. **JwtTokenProvider.java:205** - UserRole.fromName不存在\n   改为 `UserRole.fromCode()` 或 `UserRole.valueOf()`\n\n10. **AuthServiceImpl.java** - ErrorCode无法转换为String\n    已由我修复的BusinessException(ErrorCode, String)构造函数解决\n\n请逐个文件修复以上错误，每修完一个运行 `mvn compile` 验证。\n\n注意：已修复的文件不要再次修改。",
+      "assigned_to": "code-agent2-im",
+      "verified_by": "verifier",
+      "verify_prompt": "在 E:\\Desktop\\version 目录运行 `mvn compile`，确认编译成功（0 错误）。",
+      "timeout_ms": 1800000
+    },
+    {
+      "task_id": "track-a-scaffold-fix",
+      "title": "Track A - 修复剩余编译错误",
+      "prompt": "项目根目录：E:\\Desktop\\version\n\n我已修复了核心骨架问题，请继续修复以下剩余编译错误：\n\n**已修复：**\n- TaskStatus: getCode/fromCode/canTransitionTo/RUNNING/PARTIAL_COMPLETED\n- IssueStatus: NEW/INFO常量+getCode/getName\n- IssueSeverity: getName/getDescription\n- BusinessException: ErrorCode构造函数\n- ReviewTask: Lombok+完整字段\n- ReviewTaskService: 匹配接口\n\n**仍需修复：**\n\n1. **ReviewTaskServiceInterface.java** - 我已重写，需要确保其他Service(IssueService/RuleService)也匹配其接口\n\n2. **ClassServiceImpl.java** - 检查与ClassServiceInterface的接口匹配性\n   - builder()方法调用、getCode()调用等\n\n3. **AuthServiceImpl.java** - BusinessException签名\n   已由我修复解决\n\n4. **ClassController.java** - Result.success()方法调用\n   Result类可能缺少2参数版本的success方法\n\n5. **ClassService.java/Interface** - 确保与ClassController匹配\n\n6. **init.sql** - 两阶段建表确保FK顺序正确\n\n修复完成后运行 `mvn compile` 确认编译成功。",
+      "assigned_to": "code-agent3-team",
+      "verified_by": "verifier",
+      "verify_prompt": "在 E:\\Desktop\\version 目录运行 `mvn compile`，确认编译成功（0 错误）。",
+      "timeout_ms": 1800000
+    }
+  ],
+  "plan_complete": false,
+  "message_to_user": "我已直接修复核心骨架问题（TaskStatus/IssueStatus/IssueSeverity/BusinessException/ReviewTask/ReviewTaskService）。Cycle 7 继续修剩余的 RuleController签名不匹配、ReportGenerator fastjson2参数等问题。"
+}

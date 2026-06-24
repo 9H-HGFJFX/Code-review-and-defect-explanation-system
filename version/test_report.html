@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Test Report</title>
+<style>body{font-family:-apple-system,Microsoft YaHei,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;margin:0;padding:30px;color:#333}
+.container{max-width:1200px;margin:0 auto;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden}
+.header{padding:40px;background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff}
+.header h1{margin:0;font-size:28px}
+.header .sub{opacity:.9;margin-top:8px;font-size:14px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#e9ecef}
+.summary .cell{padding:25px;background:#fff;text-align:center}
+.summary .num{font-size:36px;font-weight:700}
+.summary .lbl{color:#6c757d;font-size:13px;margin-top:6px;text-transform:uppercase}
+.section{padding:30px}
+.section-title{font-size:20px;color:#1e3c72;margin-bottom:20px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px;text-align:left;border-bottom:1px solid #e9ecef}
+th{background:#f8f9fa;color:#495057;font-weight:600;font-size:13px}
+tr:hover{background:#f8f9ff}
+.footer{padding:20px;text-align:center;color:#868e96;background:#f8f9fa;font-size:13px}</style></head><body>
+<div class="container">
+<div class="header">
+<h1>Test Execution Report</h1>
+<div class="sub">Code Review System - Functional Test Suite</div>
+</div>
+<div class="summary">
+<div class="cell"><div class="num" style="color:#c92a2a">3</div><div class="lbl">Passed</div></div>
+<div class="cell"><div class="num" style="color:#c92a2a">4</div><div class="lbl">Failed</div></div>
+<div class="cell"><div class="num" style="color:#1971c2"></div><div class="lbl">Info</div></div>
+</div>
+<div class="section">
+<div class="section-title">Test Results</div>
+<table>
+<thead><tr><th>Status</th><th>Step</th><th>Description</th><th>Details</th></tr></thead>
+<tbody><tr><td><span style='color:#2f9e44;font-weight:600'>[PASS]</span></td><td>1.1</td><td>Login with admin/admin123</td><td style='font-size:12px;color:#666'>User: admin, Role: SUPER_ADMIN, Token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiO...</td></tr><tr><td><span style='color:#2f9e44;font-weight:600'>[PASS]</span></td><td>2.1</td><td>GET /api/classes</td><td style='font-size:12px;color:#666'>Found 6 classes</td></tr><tr><td><span style='color:#1971c2;font-weight:600'>[INFO]</span></td><td>2.2</td><td>Use first class for testing</td><td style='font-size:12px;color:#666'>Class ID: 1, Name: Software Engineering 2024-1</td></tr><tr><td><span style='color:#2f9e44;font-weight:600'>[PASS]</span></td><td>3.1</td><td>GET /api/rules</td><td style='font-size:12px;color:#666'>Found 0 rules total</td></tr><tr><td><span style='color:#c92a2a;font-weight:600'>[FAIL]</span></td><td>4.1</td><td>Create task</td><td style='font-size:12px;color:#666'>远程服务器返回错误: (500) 内部服务器错误。</td></tr><tr><td><span style='color:#c92a2a;font-weight:600'>[FAIL]</span></td><td>5.1</td><td>Verify task</td><td style='font-size:12px;color:#666'>远程服务器返回错误: (500) 内部服务器错误。</td></tr><tr><td><span style='color:#c92a2a;font-weight:600'>[FAIL]</span></td><td>6.1</td><td>Token refresh</td><td style='font-size:12px;color:#666'>远程服务器返回错误: (500) 内部服务器错误。</td></tr><tr><td><span style='color:#c92a2a;font-weight:600'>[FAIL]</span></td><td>7.1</td><td>Auth check</td><td style='font-size:12px;color:#666'>远程服务器返回错误: (400) 错误的请求。</td></tr></tbody>
+</table>
+</div>
+<div class="footer">Generated at 2026-06-24 11:19:14 &middot; Backend: Spring Boot 8080</div>
+</div></body></html>

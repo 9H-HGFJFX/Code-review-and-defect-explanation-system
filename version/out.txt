@@ -1,0 +1,1 @@
+cmd /c 'C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe -u root -h 127.0.0.1 -P 3307 --connect-timeout=5 -B -e SELECT id,name FROM code_review.class LIMIT 2 '; Get-Content E:\Desktop\version\out.txt
