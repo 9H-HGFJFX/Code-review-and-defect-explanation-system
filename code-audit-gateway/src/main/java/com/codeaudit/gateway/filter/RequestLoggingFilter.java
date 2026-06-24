@@ -21,7 +21,7 @@ public class RequestLoggingFilter implements WebFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         long start = System.currentTimeMillis();
-        String method = request.getMethodValue();
+        String method = request.getMethod().name();
         String path = request.getURI().getPath();
         String ip = clientIp(request);
         String userId = request.getHeaders().getFirst("X-User-Id");

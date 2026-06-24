@@ -1,0 +1,1 @@
+import{r}from"./index-fM6-uwDs.js";const s={submit:e=>r({url:"/review/submit",method:"post",data:e}),detail:e=>r({url:`/review/${e}`,method:"get"}),history:(e=1,t=10)=>r({url:"/review/list",method:"get",params:{current:e,size:t}}),allHistory:(e=1,t=10)=>r({url:"/review/list-all",method:"get",params:{current:e,size:t}})};export{s as r};

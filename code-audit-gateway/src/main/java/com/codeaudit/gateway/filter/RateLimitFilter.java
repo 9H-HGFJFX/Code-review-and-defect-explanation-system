@@ -75,7 +75,7 @@ public class RateLimitFilter implements WebFilter, Ordered {
         String simplePath = path.replaceFirst("^/api", "");
         String key = "ratelimit:" + userId + ":" + simplePath + ":" + minute;
 
-        return redis.execute(script, List.of(key), "60", String.valueOf(limit))
+        return redis.execute(script, List.of(key, "60", String.valueOf(limit)))
                 .next()
                 .flatMap(allowed -> {
                     if (allowed != null && allowed == 1L) {

@@ -79,7 +79,7 @@ async function submit() {
 
 async function remove(row: RuleVO) {
   try {
-    await ElMessageBox.confirm(\`确认删除规则 "\${row.name}"？\`, '提示', { type: 'warning' })
+    await ElMessageBox.confirm(`确认删除规则 "${row.name}"？`, '提示', { type: 'warning' })
     await ruleApi.remove(row.id)
     ElMessage.success('已删除')
     load()
@@ -153,13 +153,13 @@ onMounted(load)
         </el-table-column>
         <el-table-column label="启用" width="80">
           <template #default="{ row }">
-            <el-switch :model-value="row.enabled === 1" @change="toggle(row)" />
+            <el-switch :model-value="row.enabled === 1" @change="toggle(row as any)" />
           </template>
         </el-table-column>
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link size="small" @click="openEdit(row)"><el-icon><Edit /></el-icon> 编辑</el-button>
-            <el-button v-if="row.isBuiltin !== 1" type="danger" link size="small" @click="remove(row)">
+            <el-button type="primary" link size="small" @click="openEdit(row as any)"><el-icon><Edit /></el-icon> 编辑</el-button>
+            <el-button v-if="row.isBuiltin !== 1" type="danger" link size="small" @click="remove(row as any)">
               <el-icon><Delete /></el-icon> 删除
             </el-button>
           </template>

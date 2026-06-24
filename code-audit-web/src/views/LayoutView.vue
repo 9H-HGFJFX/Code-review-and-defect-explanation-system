@@ -67,7 +67,7 @@ router.afterEach((to) => { activeMenu.value = to.path })
                 {{ (auth.user?.realName || auth.user?.username || 'U').charAt(0).toUpperCase() }}
               </el-avatar>
               {{ auth.user?.realName || auth.user?.username }}
-              <el-tag size="small" :type="auth.user?.role === 'ADMIN' ? 'danger' : auth.user?.role === 'TEACHER' ? 'warning' : ''" style="margin-left: 8px">
+              <el-tag size="small" :type="(auth.user?.role === 'ADMIN' ? 'danger' : auth.user?.role === 'TEACHER' ? 'warning' : 'info') as any" style="margin-left: 8px">
                 {{ auth.user?.role === 'ADMIN' ? '管理员' : auth.user?.role === 'TEACHER' ? '教师' : '学生' }}
               </el-tag>
             </span>

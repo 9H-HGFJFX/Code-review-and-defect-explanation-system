@@ -70,7 +70,7 @@ async function submit() {
   try {
     const r = await reviewApi.submit({ code: code.value, fileName: fileName.value })
     result.value = r
-    ElMessage.success(\`审查完成，发现 \${r.issueCount} 个问题\`)
+    ElMessage.success(`审查完成，发现 ${r.issueCount} 个问题`)
     // 跳到详情页
     router.push({ name: 'review', params: { id: r.reviewId } })
   } catch (e: any) {
@@ -123,7 +123,7 @@ onMounted(() => {
             <span class="user-info">
               <el-icon><UserFilled /></el-icon>
               {{ auth.user?.username || '用户' }}
-              <el-tag size="small" :type="auth.user?.role === 'ADMIN' ? 'danger' : auth.user?.role === 'TEACHER' ? 'warning' : ''">
+              <el-tag size="small" :type="(auth.user?.role === 'ADMIN' ? 'danger' : auth.user?.role === 'TEACHER' ? 'warning' : 'info') as any">
                 {{ auth.user?.role }}
               </el-tag>
             </span>

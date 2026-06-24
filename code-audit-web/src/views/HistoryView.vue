@@ -51,7 +51,7 @@ onMounted(load)
         </el-table-column>
         <el-table-column prop="status" label="状态" width="120">
           <template #default="{ row }">
-            <el-tag :type="row.status === 'COMPLETED' ? 'success' : row.status === 'FAILED' ? 'danger' : ''" size="small">
+            <el-tag :type="(row.status === 'COMPLETED' ? 'success' : row.status === 'FAILED' ? 'danger' : 'info') as any" size="small">
               {{ row.status }}
             </el-tag>
           </template>

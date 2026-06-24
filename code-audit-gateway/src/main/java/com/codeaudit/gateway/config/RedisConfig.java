@@ -2,7 +2,7 @@ package com.codeaudit.gateway.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -11,7 +11,14 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
 
     @Bean
-    public ReactiveStringRedisTemplate reactiveStringRedisTemplate(RedisConnectionFactory factory) {
-        return new ReactiveStringRedisTemplate(factory, RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()));
+    public ReactiveStringRedisTemplate reactiveStringRedisTemplate(ReactiveRedisConnectionFactory factory) {
+        RedisSerializationContext<String, String> serializationContext = RedisSerializationContext
+                .<String, String>newSerializationContext(new StringRedisSerializer())
+                .key(new StringRedisSerializer())
+                .value(new StringRedisSerializer())
+                .hashKey(new StringRedisSerializer())
+                .hashValue(new StringRedisSerializer())
+                .build();
+        return new ReactiveStringRedisTemplate(factory, serializationContext);
     }
 }

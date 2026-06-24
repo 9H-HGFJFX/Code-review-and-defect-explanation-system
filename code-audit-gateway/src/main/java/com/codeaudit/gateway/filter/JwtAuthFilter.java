@@ -51,7 +51,7 @@ public class JwtAuthFilter implements WebFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         String path = request.getURI().getPath();
-        String method = request.getMethodValue();
+        String method = request.getMethod().name();
 
         // CORS 预检
         if ("OPTIONS".equalsIgnoreCase(method)) {
@@ -89,7 +89,7 @@ public class JwtAuthFilter implements WebFilter, Ordered {
 
         // 黑名单校验
         return redisTemplate.hasKey("jwt:blacklist:" + token)
-                .flatPresent(blacklisted -> {
+                .flatMap(blacklisted -> {
                     if (blacklisted) {
                         return unauthorized(exchange, "Token 已登出");
                     }

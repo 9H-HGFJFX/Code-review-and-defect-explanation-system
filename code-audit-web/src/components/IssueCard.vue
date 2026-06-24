@@ -24,9 +24,9 @@ const catLabel: Record<string, string> = {
   <el-card class="issue-card" :class="['issue-' + issue.severity]" shadow="hover">
     <div class="issue-header">
       <div class="flex items-center gap-12">
-        <el-tag :type="issue.severity === 'CRITICAL' ? 'danger' :
+        <el-tag :type="(issue.severity === 'CRITICAL' ? 'danger' :
                      issue.severity === 'ERROR' ? 'warning' :
-                     issue.severity === 'WARNING' ? '' : 'info'" effect="dark" size="small">
+                     issue.severity === 'WARNING' ? 'info' : 'info') as any" effect="dark" size="small">
           {{ sevLabel[issue.severity] || issue.severity }}
         </el-tag>
         <el-tag size="small" :type="issue.category === 'SECURITY' ? 'danger' :

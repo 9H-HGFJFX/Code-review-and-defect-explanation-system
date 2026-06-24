@@ -40,7 +40,7 @@ public class JsonErrorWebExceptionHandler implements ErrorWebExceptionHandler {
         body.put("data", null);
 
         log.warn("[GW_ERR] {} {} -> {} {}",
-                exchange.getRequest().getMethodValue(),
+                exchange.getRequest().getMethod().name(),
                 exchange.getRequest().getURI().getPath(),
                 status.value(), ex.getMessage());
 
